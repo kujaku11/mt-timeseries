@@ -35,8 +35,8 @@ from mt_metadata.timeseries.filters import ChannelResponse
 from obspy.core import Trace
 from scipy import signal
 
-from timeseries.ts_filters import RemoveInstrumentResponse
-from timeseries.ts_helpers import get_decimation_sample_rates, make_dt_coordinates
+from .ts_filters import RemoveInstrumentResponse
+from .ts_helpers import get_decimation_sample_rates, make_dt_coordinates
 from mth5.utils import fdsn_tools
 
 

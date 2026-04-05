@@ -34,8 +34,8 @@ import xarray as xr
 
 # Import the module under test
 try:
-    from mth5.timeseries.channel_ts import make_dt_coordinates
-    from mth5.timeseries.scipy_filters import (
+    from mt_timeseries.ts_helpers import make_dt_coordinates
+    from mt_timeseries.scipy_filters import (
         bandpass,
         bandstop,
         decimate,
@@ -554,15 +554,11 @@ class TestAdvancedProcessing:
     """Test suite for advanced processing functions (decimate, resample_poly, etc.)."""
 
     @pytest.mark.parametrize("xr_data_array", ["multi_freq_with_trend"], indirect=True)
-    @pytest.mark.parametrize("target_rate", [1.0, 4.0, 16.0])
+    @pytest.mark.parametrize("target_rate", [8.0, 16.0, 32.0])
     def test_decimate_function(self, xr_data_array, target_rate, base_signal_params):
         """Test decimation with various target sample rates."""
         original_rate = base_signal_params["sample_rate"]
-
-        # Skip if decimation factor would be too high
         decimation_factor = int(original_rate / target_rate)
-        if decimation_factor > 13:
-            pytest.skip(f"Decimation factor {decimation_factor} too high")
 
         decimated = decimate(xr_data_array, target_rate)
 

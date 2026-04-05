@@ -17,7 +17,7 @@ import pandas as pd
 import pytest
 from mt_metadata import timeseries as metadata
 
-from mth5 import timeseries
+import mt_timeseries as timeseries
 
 
 # =============================================================================

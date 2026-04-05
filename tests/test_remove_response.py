@@ -22,7 +22,7 @@ from mt_metadata.timeseries.filters import (
     TimeDelayFilter,
 )
 
-from mth5.timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 # =============================================================================
@@ -77,27 +77,12 @@ def time_delay_filter():
     return td
 
 
-@pytest.fixture(params=["magnetic", "electric", "auxiliary"])
-def channel_type(request):
-    """Parameterized fixture for different channel types."""
-    return request.param
-
-
 @pytest.fixture
-def base_channel(channel_type):
+def base_channel():
     """Create a base channel with minimal configuration."""
-    channel = ChannelTS(channel_type=channel_type)
-
-    # Set appropriate component based on channel type
-    if channel_type.lower() == "magnetic":
-        channel.channel_metadata.component = "hx"
-        channel.channel_metadata.units = "Volt"
-    elif channel_type.lower() == "electric":
-        channel.channel_metadata.component = "ex"
-        channel.channel_metadata.units = "Volt"
-    else:  # auxiliary
-        channel.channel_metadata.component = "temperature"
-        channel.channel_metadata.units = "Volt"
+    channel = ChannelTS(channel_type="magnetic")
+    channel.channel_metadata.component = "hx"
+    channel.channel_metadata.units = "Volt"
 
     channel.sample_rate = 1.0
     return channel
@@ -142,9 +127,6 @@ def magnetic_channel_with_response(
     base_channel, basic_pole_zero_filter, example_time_series, test_signal_params
 ):
     """Create a magnetic channel with applied instrument response and test data."""
-    if base_channel.channel_type.lower() != "magnetic":
-        pytest.skip("This fixture is only for magnetic channels")
-
     channel = base_channel
     pz_filter = basic_pole_zero_filter
 
@@ -333,9 +315,6 @@ class TestRemoveResponseMultipleFilters:
         test_signal_params,
     ):
         """Create a channel with multiple filters applied."""
-        if base_channel.channel_type.lower() != "magnetic":
-            pytest.skip("This fixture is only for magnetic channels")
-
         channel = base_channel
         filters = [basic_pole_zero_filter, coefficient_filter, fap_filter]
 

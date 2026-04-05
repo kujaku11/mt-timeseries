@@ -67,11 +67,10 @@ dev = [
 zip-safe = false
 include-package-data = true
 license-files = ["LICENSE"]
-packages = ["mt_timeseries", "mt_timeseries.spectre"]
 
-[tool.setuptools.package-dir]
-mt_timeseries = "src"
-"mt_timeseries.spectre" = "src/spectre"
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mt_timeseries*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.json"]
@@ -83,6 +82,7 @@ markers = [
     "slow: mark test as slow running"
 ]
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.black]
 line-length = 88
@@ -120,7 +120,7 @@ tag = true
 filename = "pyproject.toml"
 
 [[tool.bumpversion.files]]
-filename = "src/__init__.py"
+filename = "src/mt_timeseries/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "README.md"
