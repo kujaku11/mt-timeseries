@@ -1,0 +1,104 @@
+name: Publish to PyPI
+
+on:
+  workflow_run:
+    workflows: ["Bump Version on Merge"]
+    types: [completed]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Check release labels on merged PR
+        id: release_label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prs = context.payload.workflow_run.pull_requests || [];
+            if (prs.length === 0) {
+              core.setOutput('is_release', 'false');
+              return;
+            }
+
+            const prNumber = prs[0].number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const labels = (pr.labels || []).map((label) => label.name);
+            const hasReleaseLabel =
+              labels.includes('release:major') ||
+              labels.includes('release:minor') ||
+              labels.includes('release:patch');
+
+            core.info(`PR #${prNumber} labels: ${labels.join(', ')}`);
+            core.setOutput('is_release', hasReleaseLabel ? 'true' : 'false');
+
+      - name: Install build tool
+        if: steps.release_label.outputs.is_release == 'true'
+        run: pip install build
+
+      - name: Read package version
+        if: steps.release_label.outputs.is_release == 'true'
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(python - <<'PY'
+          import tomllib
+          from pathlib import Path
+
+          data = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+          print(data['project']['version'])
+          PY
+          )
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure git tag exists
+        if: steps.release_label.outputs.is_release == 'true'
+        shell: bash
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists"
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Create GitHub Release
+        if: steps.release_label.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+
+      - name: Build package
+        if: steps.release_label.outputs.is_release == 'true'
+        run: python -m build
+
+      - name: Publish to PyPI
+        if: steps.release_label.outputs.is_release == 'true'
+        uses: pypa/gh-action-pypi-publish@v1.13.0
+        with:
+          skip-existing: true
