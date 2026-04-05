@@ -47,12 +47,14 @@ Repository = "https://github.com/kujaku11/mt-timeseries"
 [project.optional-dependencies]
 test = [
     "pytest>=3",
+    "pytest-cov",
     "pytest-xdist",
     "pytest-subtests",
     "pytest-benchmark",
 ]
 dev = [
     "pytest>=3",
+    "pytest-cov",
     "pytest-xdist",
     "pytest-subtests",
     "pytest-runner",

@@ -779,7 +779,9 @@ class TestRunTSObspyIntegration:
 
         assert isinstance(new_run, RunTS)
         assert new_run.dataset is not None
-        assert new_run.dataset.sizes["time"] == multi_channel_run_ts.dataset.sizes["time"]
+        assert (
+            new_run.dataset.sizes["time"] == multi_channel_run_ts.dataset.sizes["time"]
+        )
         # Round-trip channel naming is not one-to-one yet in all cases; validate
         # reliable behavior (successful import with populated channel data).
         assert len(new_run.channels) > 0
