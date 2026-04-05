@@ -8,3 +8,4 @@ Welcome to the mt-timeseries documentation.
    :caption: Contents
 
    api/index
+   notebooks/index

@@ -46,19 +46,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "nbsphinx",
-    "autoapi.extension",
     "myst_parser",
-]
-
-# AutoAPI configuration
-autoapi_dirs = ["../src/mt_timeseries"]
-autoapi_type = "python"
-autoapi_options = [
-    "members",
-    "undoc-members",
-    "show-inheritance",
-    "show-module-summary",
-    "imported-members",
 ]
 
 # nbsphinx_allow_errors = True
@@ -136,7 +124,7 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_logo = "source/images/mth5_logo.png"
+html_logo = "images/mth5_logo.png"
 html_theme_options = {
     "logo_only": True,
 }
