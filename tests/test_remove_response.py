@@ -24,7 +24,6 @@ from mt_metadata.timeseries.filters import (
 
 from mt_timeseries import ChannelTS
 
-
 # =============================================================================
 # Test Fixtures
 # =============================================================================

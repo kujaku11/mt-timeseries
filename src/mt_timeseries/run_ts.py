@@ -32,16 +32,26 @@ from mt_metadata import timeseries
 from mt_metadata.common.list_dict import ListDict
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries.filters import ChannelResponse
-from obspy.core import Stream
+
+try:
+    from obspy.core import Stream
+except ImportError:
+    Stream = None
 
 from .channel_ts import ChannelTS
 from .ts_helpers import get_decimation_sample_rates, make_dt_coordinates
-
 
 # =============================================================================
 # make a dictionary of available metadata classes
 # =============================================================================
 meta_classes = dict(inspect.getmembers(timeseries, inspect.isclass))
+
+
+def _obspy_import_error_message() -> str:
+    return (
+        "ObsPy is required for this operation but is not installed. "
+        "Install optional dependency `mt-timeseries[obspy]`."
+    )
 
 
 # =============================================================================
@@ -1500,6 +1510,10 @@ class RunTS:
         ChannelTS.to_obspy_trace : Convert single channel
 
         """
+        if Stream is None:
+            msg = _obspy_import_error_message()
+            self.logger.warning(msg)
+            raise ImportError(msg)
 
         trace_list = []
         for channel in self.channels:
@@ -1566,6 +1580,11 @@ class RunTS:
             "h2": "hy",
             "h3": "hz",
         }
+
+        if Stream is None:
+            msg = _obspy_import_error_message()
+            self.logger.warning(msg)
+            raise ImportError(msg)
 
         if not isinstance(obspy_stream, Stream):
             msg = f"Input must be obspy.core.Stream not {type(obspy_stream)}"
