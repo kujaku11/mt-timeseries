@@ -1,12 +1,14 @@
 # mt-timeseries
 
-mt-timeseries provides container classes for magnetotelluric (MT) time series
+`mt-timeseries` provides container classes for magnetotelluric (MT) time series
 data with metadata-aware processing and conversion utilities.
 
 The two primary classes are:
 
 - ChannelTS: single-channel time series container backed by xarray.DataArray.
 - RunTS: multi-channel run container backed by xarray.Dataset.
+
+**version**: 0.0.1
 
 ## Why use mt-timeseries
 
