@@ -8,7 +8,7 @@ The two primary classes are:
 - ChannelTS: single-channel time series container backed by xarray.DataArray.
 - RunTS: multi-channel run container backed by xarray.Dataset.
 
-**version**: 0.0.1
+**version**: 0.0.2
 
 ## Why use mt-timeseries
 
