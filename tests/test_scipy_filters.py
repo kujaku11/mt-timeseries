@@ -31,10 +31,8 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-
 # Import the module under test
 try:
-    from mt_timeseries.ts_helpers import make_dt_coordinates
     from mt_timeseries.scipy_filters import (
         bandpass,
         bandstop,
@@ -50,6 +48,7 @@ try:
         savgol_filter,
         UnevenSamplingWarning,
     )
+    from mt_timeseries.ts_helpers import make_dt_coordinates
 
     # Test import successful
     SCIPY_FILTERS_AVAILABLE = True

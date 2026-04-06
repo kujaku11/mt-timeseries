@@ -17,7 +17,6 @@ from loguru import logger
 # Local imports
 from mt_metadata.common.band import Band
 from mt_metadata.processing.aurora.frequency_bands import FrequencyBands
-
 from mth5.timeseries.xarray_helpers import covariance_xr, initialize_xrda_2d
 
 
