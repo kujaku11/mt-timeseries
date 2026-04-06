@@ -12,12 +12,18 @@ Pytest suite for ChannelTS object - optimized with fixtures and subtests
 # imports
 # =============================================================================
 
+import importlib.util
+from unittest.mock import MagicMock
+
 import numpy as np
 import pandas as pd
 import pytest
 from mt_metadata import timeseries as metadata
 
 import mt_timeseries as timeseries
+import mt_timeseries.channel_ts as channel_ts_module
+
+OBSPY_AVAILABLE = importlib.util.find_spec("obspy") is not None
 
 
 # =============================================================================
@@ -645,6 +651,7 @@ class TestChannelTSIntegration:
         with subtests.test(name="start_time"):
             assert auxiliary_ts.start == "2020-01-01T12:00:00+00:00"
 
+    @pytest.mark.skipif(not OBSPY_AVAILABLE, reason="obspy is not installed")
     def test_to_obspy_trace(self, obspy_test_channel, subtests):
         """Test conversion to ObsPy trace"""
         tr = obspy_test_channel.to_obspy_trace()
@@ -670,6 +677,7 @@ class TestChannelTSIntegration:
         with subtests.test(name="data_equality"):
             assert np.allclose(obspy_test_channel.ts, tr.data)
 
+    @pytest.mark.skipif(not OBSPY_AVAILABLE, reason="obspy is not installed")
     def test_from_obspy_trace(self, obspy_test_channel, subtests):
         """Test initialization from ObsPy trace"""
         tr = obspy_test_channel.to_obspy_trace()
@@ -696,6 +704,36 @@ class TestChannelTSIntegration:
 
         with subtests.test(name="data_equality"):
             assert np.allclose(obspy_test_channel.ts, new_ch.ts)
+
+
+class TestChannelTSObspyOptionalDependency:
+    """Test behavior when ObsPy is unavailable."""
+
+    def test_to_obspy_trace_missing_obspy_logs_warning(
+        self, obspy_test_channel, monkeypatch
+    ):
+        """Ensure a warning is emitted before raising ImportError."""
+        warning_mock = MagicMock()
+        obspy_test_channel.logger = MagicMock(warning=warning_mock)
+        monkeypatch.setattr(channel_ts_module, "Trace", None)
+
+        with pytest.raises(ImportError, match="ObsPy is required"):
+            obspy_test_channel.to_obspy_trace()
+
+        warning_mock.assert_called_once()
+
+    def test_from_obspy_trace_missing_obspy_logs_warning(
+        self, auxiliary_ts, monkeypatch
+    ):
+        """Ensure a warning is emitted before raising ImportError."""
+        warning_mock = MagicMock()
+        auxiliary_ts.logger = MagicMock(warning=warning_mock)
+        monkeypatch.setattr(channel_ts_module, "Trace", None)
+
+        with pytest.raises(ImportError, match="ObsPy is required"):
+            auxiliary_ts.from_obspy_trace(obspy_trace=object())
+
+        warning_mock.assert_called_once()
 
 
 # =============================================================================

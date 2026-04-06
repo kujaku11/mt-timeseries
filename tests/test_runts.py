@@ -9,6 +9,9 @@ subtests for efficiency while maintaining comprehensive coverage.
 """
 
 
+import importlib.util
+from unittest.mock import MagicMock
+
 import mt_metadata.timeseries as metadata
 import numpy as np
 
@@ -19,7 +22,10 @@ import pytest
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries.filters import ChannelResponse, PoleZeroFilter
 
+import mt_timeseries.run_ts as run_ts_module
 from mt_timeseries import ChannelTS, RunTS
+
+OBSPY_AVAILABLE = importlib.util.find_spec("obspy") is not None
 
 
 # =============================================================================
@@ -756,6 +762,7 @@ class TestRunTSMerging:
 class TestRunTSObspyIntegration:
     """Test ObsPy Stream integration."""
 
+    @pytest.mark.skipif(not OBSPY_AVAILABLE, reason="obspy is not installed")
     def test_to_obspy_stream(self, multi_channel_run_ts):
         """Test conversion to ObsPy Stream."""
         from obspy.core import Stream
@@ -770,6 +777,7 @@ class TestRunTSObspyIntegration:
             assert trace.stats.sampling_rate == multi_channel_run_ts.sample_rate
             assert trace.stats.npts == multi_channel_run_ts.dataset.sizes["time"]
 
+    @pytest.mark.skipif(not OBSPY_AVAILABLE, reason="obspy is not installed")
     def test_from_obspy_stream(self, multi_channel_run_ts):
         """Test creation from ObsPy Stream."""
         stream = multi_channel_run_ts.to_obspy_stream()
@@ -785,6 +793,35 @@ class TestRunTSObspyIntegration:
         # Round-trip channel naming is not one-to-one yet in all cases; validate
         # reliable behavior (successful import with populated channel data).
         assert len(new_run.channels) > 0
+
+
+class TestRunTSObspyOptionalDependency:
+    """Test behavior when ObsPy is unavailable."""
+
+    def test_to_obspy_stream_missing_obspy_logs_warning(
+        self, multi_channel_run_ts, monkeypatch
+    ):
+        """Ensure a warning is emitted before raising ImportError."""
+        warning_mock = MagicMock()
+        multi_channel_run_ts.logger = MagicMock(warning=warning_mock)
+        monkeypatch.setattr(run_ts_module, "Stream", None)
+
+        with pytest.raises(ImportError, match="ObsPy is required"):
+            multi_channel_run_ts.to_obspy_stream()
+
+        warning_mock.assert_called_once()
+
+    def test_from_obspy_stream_missing_obspy_logs_warning(self, monkeypatch):
+        """Ensure a warning is emitted before raising ImportError."""
+        warning_mock = MagicMock()
+        run = RunTS()
+        run.logger = MagicMock(warning=warning_mock)
+        monkeypatch.setattr(run_ts_module, "Stream", None)
+
+        with pytest.raises(ImportError, match="ObsPy is required"):
+            run.from_obspy_stream(obspy_stream=None)
+
+        warning_mock.assert_called_once()
 
 
 # =============================================================================

@@ -62,7 +62,7 @@ dev = [
     "isort",
     "pre-commit",
 ]
-obspy = [obspy]
+obspy = ["obspy"]
 
 [tool.setuptools]
 zip-safe = false

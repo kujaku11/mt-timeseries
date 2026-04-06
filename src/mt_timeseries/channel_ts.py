@@ -32,18 +32,28 @@ from mt_metadata.common.list_dict import ListDict
 from mt_metadata.common.mttime import MTime
 from mt_metadata.common.units import get_unit_object
 from mt_metadata.timeseries.filters import ChannelResponse
-from obspy.core import Trace
 from scipy import signal
 
+try:
+    from obspy.core import Trace
+except ImportError:
+    Trace = None
+
+from . import fdsn_tools
 from .ts_filters import RemoveInstrumentResponse
 from .ts_helpers import get_decimation_sample_rates, make_dt_coordinates
-from mth5.utils import fdsn_tools
-
 
 # =============================================================================
 # make a dictionary of available metadata classes
 # =============================================================================
 meta_classes = dict(inspect.getmembers(metadata, inspect.isclass))
+
+
+def _obspy_import_error_message() -> str:
+    return (
+        "ObsPy is required for this operation but is not installed. "
+        "Install optional dependency `mt-timeseries[obspy]`."
+    )
 
 
 # ==============================================================================
@@ -1880,6 +1890,11 @@ class ChannelTS:
         :rtype: TYPE
 
         """
+        if Trace is None:
+            msg = _obspy_import_error_message()
+            self.logger.warning(msg)
+            raise ImportError(msg)
+
         encoding_dict = {
             "INT16": np.int16,
             "INT32": np.int32,
@@ -1918,6 +1933,10 @@ class ChannelTS:
         :param obspy.core.trace obspy_trace: Obspy trace object
 
         """
+        if Trace is None:
+            msg = _obspy_import_error_message()
+            self.logger.warning(msg)
+            raise ImportError(msg)
 
         if not isinstance(obspy_trace, Trace):
             msg = f"Input must be obspy.core.Trace, not {type(obspy_trace)}"
