@@ -69,6 +69,7 @@ def main():
 if __name__ == "__main__":
     main()
 """
+
 import unittest
 
 # =============================================================================
@@ -77,7 +78,6 @@ import unittest
 import numpy as np
 
 from mt_timeseries.ts_filters import butter_bandpass, butter_bandpass_filter
-
 
 # =============================================================================
 #

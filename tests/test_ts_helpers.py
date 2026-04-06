@@ -4,6 +4,7 @@ Created on Wed Mar 29 14:30:08 2023
 
 @author: jpeacock
 """
+
 import sys
 import unittest
 
@@ -17,7 +18,6 @@ from mt_timeseries.ts_helpers import (
     get_decimation_sample_rates,
     make_dt_coordinates,
 )
-
 
 # =============================================================================
 

@@ -12,7 +12,6 @@ from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from scipy import signal
 
-
 # =================================================================
 
 
@@ -581,7 +580,7 @@ class RemoveInstrumentResponse:
             ts = self.apply_zero_pad(ts)
             self.logger.debug(f"Step {step}: Applying Zero Padding")
             step += 1
-        
+
         # get the real frequencies of the FFT -- zero pad may have changed ts.size
         f = np.fft.rfftfreq(ts.size, d=self.sample_interval)
 
@@ -629,10 +628,12 @@ class RemoveInstrumentResponse:
         else:
             msg = f"Operation {operation} not recognized method of instrument response correction"
             logger.error(msg)
-            raise ValueError(msg)    
+            raise ValueError(msg)
         calibrated_ts = np.fft.irfft(calibrated_spectrum)
         calibrated_ts = np.real(calibrated_ts)
-        calibrated_ts = calibrated_ts[0 : self.ts.size]  # TODO: Add doc ... should this be removing equal pads from both sides?
+        calibrated_ts = calibrated_ts[
+            0 : self.ts.size
+        ]  # TODO: Add doc ... should this be removing equal pads from both sides?
         step += 1
 
         # If a time window was applied, need to un-apply it to reconstruct the signal.
