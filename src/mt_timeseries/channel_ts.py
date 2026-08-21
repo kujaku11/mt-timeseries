@@ -1964,8 +1964,7 @@ class ChannelTS:
         self.station_metadata.fdsn.id = obspy_trace.stats.station
         # Handle None network values
         if (
-            obspy_trace.stats.network is not None
-            and obspy_trace.stats.network != "None"
+            obspy_trace.stats.network not in [None, "None", "", "none", "NONE", "NULL"]
         ):
             self.station_metadata.fdsn.network = obspy_trace.stats.network
         self.station_metadata.id = obspy_trace.stats.station
