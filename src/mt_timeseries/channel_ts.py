@@ -873,7 +873,7 @@ class ChannelTS:
         pandas.DatetimeIndex
             Time index (existing or reconstructed from start/sample_rate).
         """
-        if isinstance(ts_arr.index[0], pd._libs.tslibs.timestamps.Timestamp):
+        if isinstance(ts_arr.index, pd.DatetimeIndex):
             return ts_arr.index
         else:
             return make_dt_coordinates(self.start, self.sample_rate, ts_arr.shape[0])
@@ -1212,10 +1212,7 @@ class ChannelTS:
         check to see if there is an index in the time series
         """
         if self.data_array.data.size > 1:
-            if isinstance(
-                self.data_array.indexes["time"][0],
-                pd._libs.tslibs.timestamps.Timestamp,
-            ):
+            if isinstance(self.data_array.indexes["time"], pd.DatetimeIndex):
                 return True
             return False
         else:
@@ -1966,10 +1963,7 @@ class ChannelTS:
         self.start = obspy_trace.stats.starttime.isoformat()
         self.station_metadata.fdsn.id = obspy_trace.stats.station
         # Handle None network values
-        if (
-            obspy_trace.stats.network is not None
-            and obspy_trace.stats.network != "None"
-        ):
+        if obspy_trace.stats.network not in [None, "None", "", "none", "NONE", "NULL"]:
             self.station_metadata.fdsn.network = obspy_trace.stats.network
         self.station_metadata.id = obspy_trace.stats.station
         self.channel_metadata.units = "counts"
