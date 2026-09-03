@@ -1963,9 +1963,7 @@ class ChannelTS:
         self.start = obspy_trace.stats.starttime.isoformat()
         self.station_metadata.fdsn.id = obspy_trace.stats.station
         # Handle None network values
-        if (
-            obspy_trace.stats.network not in [None, "None", "", "none", "NONE", "NULL"]
-        ):
+        if obspy_trace.stats.network not in [None, "None", "", "none", "NONE", "NULL"]:
             self.station_metadata.fdsn.network = obspy_trace.stats.network
         self.station_metadata.id = obspy_trace.stats.station
         self.channel_metadata.units = "counts"

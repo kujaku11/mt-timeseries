@@ -122,24 +122,37 @@ def read_channel_code(channel_code: str) -> dict[str, dict[str, int] | str | boo
         logger.error(msg)
         raise ValueError(msg)
 
-    if channel_code[0:2].lower() in ["ex", "ey", "e1", "e2", "hx", "hy","bx", "by","h1", "h2", "b1", "b2"]:
+    if channel_code[0:2].lower() in [
+        "ex",
+        "ey",
+        "e1",
+        "e2",
+        "hx",
+        "hy",
+        "bx",
+        "by",
+        "h1",
+        "h2",
+        "b1",
+        "b2",
+    ]:
         if channel_code[1] in ["x", "1"]:
-            orientation = {"min": 0, "max":0}
+            orientation = {"min": 0, "max": 0}
         elif channel_code[1] in ["y", "2"]:
-            orientation = {"min": 90, "max":90}
+            orientation = {"min": 90, "max": 90}
         return {
-            "period": {"min": 1, "max": 1}, 
-            "component": channel_code[0].lower(), 
-            "orientation": orientation, 
-            "vertical":False
-            }
+            "period": {"min": 1, "max": 1},
+            "component": channel_code[0].lower(),
+            "orientation": orientation,
+            "vertical": False,
+        }
     elif channel_code[0:2].lower() in ["hz", "bz", "h3", "b3"]:
         return {
-                "period": "M", 
-                "component": channel_code[0].lower(), 
-                "orientation": {"min": 0, "max":0}, 
-                "vertical":True
-                }
+            "period": "M",
+            "component": channel_code[0].lower(),
+            "orientation": {"min": 0, "max": 0},
+            "vertical": True,
+        }
 
     try:
         period_range = period_code_dict[channel_code[0].upper()]
